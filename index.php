@@ -32,8 +32,8 @@ $app->post(
 
         error_log('Rendering response...', 4);
         $app->render(200, [
-            'output_html'=>@$ans['run_status']['output_html']?:'',
-            'output'=>trim(@$ans['run_status']['output']?:''),
+            'output_html'=>(is_null($ans)?'Server busy, please wait.':@$ans['run_status']['output_html']?:''),
+            'output'=>(is_null($ans)?'Server busy, please wait.':trim(@$ans['run_status']['output']?:'')),
             'all_info'=>$ans
         ]);
     }
