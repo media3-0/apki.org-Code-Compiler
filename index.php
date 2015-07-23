@@ -32,8 +32,8 @@ $app->post(
 
         error_log('Rendering response...', 4);
         $app->render(200, [
-            'output_html'=>(is_null($ans)?'Server busy, please wait.':@$ans['run_status']['output_html']?:(@$ans['compile_status']?nl2br($ans['compile_status']):'')),
-            'output'=>(is_null($ans)?'Server busy, please wait.':trim(@$ans['run_status']['output']?:@$ans['compile_status']?:'')),
+            'output_html'=>$codeCompiler->unescapeUnicodeCharactersAsJSON((is_null($ans)?'Server busy, please wait.':@$ans['run_status']['output_html']?:(@$ans['compile_status']?nl2br($ans['compile_status']):''))),
+            'output'=>$codeCompiler->unescapeUnicodeCharactersAsJSON((is_null($ans)?'Server busy, please wait.':trim(@$ans['run_status']['output']?:@$ans['compile_status']?:''))),
             'all_info'=>$ans
         ]);
     }
