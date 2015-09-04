@@ -31,9 +31,31 @@ $app->post(
         error_log(json_encode($ans), 4);
 
         error_log('Rendering response...', 4);
+
+        switch($inputData['lang']){
+            case 'PHP':
+            case 'CLOSURE':
+            case 'JAVASCRIPT': //Cannot run it...
+                $output_html = $ans['run_status']['output_html'];
+                $output = $ans['run_status']['output'];
+                break;
+            case 'C':
+            case 'CPP':
+            case 'CPP11':
+            case 'CSHARP':
+            case 'JAVA':
+            case 'HASKELL':
+            case 'PERL':
+            case 'PYTHON':
+            case 'RUBY':
+                $output_html = ($ans['run_status']['status']=='CE')?($ans['compile_status']):($ans['run_status']['output_html']);
+                $output = ($ans['run_status']['status']=='CE')?($ans['compile_status']):($ans['run_status']['output']);
+                break;
+        }
+
         $app->render(200, [
-            'output_html'=>$codeCompiler->unescapeUnicodeCharactersAsJSON((is_null($ans)?'Server busy, please wait.':@$ans['run_status']['output_html']?:(@$ans['compile_status']?nl2br($ans['compile_status']):''))),
-            'output'=>$codeCompiler->unescapeUnicodeCharactersAsJSON((is_null($ans)?'Server busy, please wait.':trim(@$ans['run_status']['output']?:@$ans['compile_status']?:''))),
+            'output_html'=>$output_html,
+            'output'=>trim($output),
             'all_info'=>$ans
         ]);
     }

@@ -27,43 +27,17 @@ class hackerEarthV3CodeCompiler {
      * @param string $language Language. One of: ['C', 'CPP', 'CPP11', 'CLOJURE', 'CSHARP', 'JAVA', 'JAVASCRIPT', 'HASKELL', 'PERL', 'PHP', 'PYTHON', 'RUBY']. Required.
      * @param string $sourceCode Source code. Required.
      * @param string $userInput Optional. User input in console/app.
-     * @param boolean $encodeUnicodeInText Optional. If true (default) it will automatically encode unicode in source code changing UTF characters into JSON-like escaped values. It looks like it is necessary for some languages with this API.
      * @return array JSON with original response. Use ['run_status']['output_html'] to show, ['run_status']['output'] to compare. Check docs for usage and more options.
      */
-    public function run($language, $sourceCode, $userInput='', $encodeUnicodeInText=true){
+    public function run($language, $sourceCode, $userInput=''){
         $data = array_merge($this->defaultSettings, [
             'client_secret'=>$this->client_secret,
-            'source'=>$encodeUnicodeInText?$this->escapeUnicodeCharactersAsJSON($sourceCode):$sourceCode,
+            'source'=>$sourceCode,
             'lang'=>$language,
             'input'=>$userInput,
             'async'=>0
         ]);
         return ($this->curlIt(self::RUN_ENDPOINT, $data));
-    }
-
-    private function uniord($s) {
-        return unpack('V', iconv('UTF-8', 'UCS-4LE', $s))[1];
-    }
-
-    private function escapeUnicodeCharactersAsJSON($string){
-        return preg_replace_callback('/[\x{007f}-\x{ffff}]/u', function($c){
-            return '\u'.(substr('0000'.dechex($this->uniord($c[0])), -4));
-        }, $string);
-    }
-
-    private function unichr($i) {
-        return iconv('UCS-4LE', 'UTF-8', pack('V', $i));
-    }
-
-    /**
-     * Helper method to unescape unicode characters from output.
-     * @param string $string Input string
-     * @return string Output string.
-     */
-    public function unescapeUnicodeCharactersAsJSON($string){
-        return preg_replace_callback('/\\\u([0-9a-fA-F]){4}/u', function($c){
-            return $this->unichr(hexdec(substr($c[0], 2)));
-        }, $string);
     }
 
     /**
